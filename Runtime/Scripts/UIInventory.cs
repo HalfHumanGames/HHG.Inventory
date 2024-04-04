@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +18,7 @@ namespace HHG.InventorySystem.Runtime
         [SerializeField] private GridLayoutGroup slotContainer;
 
         private CanvasGroup canvasGroup;
-        private UIInventorySlot[] slots;
+        private List<UIInventorySlot> slots = new List<UIInventorySlot>();
 
         private void Awake()
         {
@@ -66,7 +68,7 @@ namespace HHG.InventorySystem.Runtime
 
         public void Refresh(IInventory inventory)
         {
-            for (int i = 0; i < slots.Length; i++)
+            for (int i = 0; i < slots.Count; i++)
             {
                 if (i < inventory.Count)
                 {
@@ -79,11 +81,31 @@ namespace HHG.InventorySystem.Runtime
             }
         }
 
+        public void Resize(Vector2Int size, int max)
+        {
+            slotContainer.constraintCount = size.x;
+            Transform container = slotContainer.transform;
+
+            while (slots.Count < max)
+            {
+                slots.Add(Instantiate(slotPrefab, container));
+            }
+
+            while (container.childCount > max)
+            {
+                int last = slots.Count - 1;
+                UIInventorySlot slot = slots[last];
+                slots.RemoveAt(last);
+                Destroy(slot.gameObject);
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(slotContainer.GetComponent<RectTransform>());
+        }
+
         private void CreateSlots()
         {
             int count = gridSize.x * gridSize.y;
-
-            slots = new UIInventorySlot[count];
+            slots = new List<UIInventorySlot>(count);
 
             if (!slotPrefab || !slotContainer) return;
 
@@ -101,9 +123,9 @@ namespace HHG.InventorySystem.Runtime
 
             if (Application.isPlaying)
             {
-                for (int i = 0; i < slots.Length; i++)
+                for (int i = 0; i < slots.Capacity; i++)
                 {
-                    slots[i] = Instantiate(slotPrefab, container);
+                    slots.Add(Instantiate(slotPrefab, container));
                 }
             }
             else
