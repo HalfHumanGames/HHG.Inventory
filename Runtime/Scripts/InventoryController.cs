@@ -46,5 +46,27 @@ namespace HHG.InventorySystem.Runtime
             uiInventory.Refresh(inventory);
             OnUpdated?.Invoke(inventory);
         }
+
+        public int AddItem(IInventoryItem item)
+        {
+            for (int i = 0; i < inventory.Count; i++)
+            {
+                if (inventory[i] == null)
+                {
+                    inventory[i] = item;
+                    uiInventory.Refresh(inventory);
+                    OnUpdated?.Invoke(inventory);
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public bool TryAddItem(IInventoryItem item, out int index)
+        {
+            index = AddItem(item);
+            return index >= 0;
+        }
     }
 }
