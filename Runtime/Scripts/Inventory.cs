@@ -19,21 +19,32 @@ namespace HHG.InventorySystem.Runtime
             }
         }
 
+        public IReadOnlyList<IInventoryItem> Items => items;
+
         private List<IInventoryItem> items;
 
-        public Inventory()
+        public Inventory(int size = 0)
         {
             items = new List<IInventoryItem>();
+            items.Resize(size);
         }
 
-        public Inventory(List<IInventoryItem> list)
+        public Inventory(List<IInventoryItem> list, int size = -1)
         {
             items = list;
+            if (size > items.Count)
+            {
+                items.Resize(size);
+            }
         }
 
-        public Inventory(IEnumerable<IInventoryItem> enumerable) : this()
+        public Inventory(IEnumerable<IInventoryItem> enumerable, int size = -1)
         {
-            items.AddRange(enumerable);
+            items = new List<IInventoryItem>();
+            if (size > items.Count)
+            {
+                items.Resize(size);
+            }
         }
 
         public void Swap(int i, int j)

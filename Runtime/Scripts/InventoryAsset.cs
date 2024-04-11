@@ -9,8 +9,6 @@ namespace HHG.InventorySystem.Runtime
     [CreateAssetMenu(fileName = "Inventory", menuName = "HHG/Inventory System/Inventory Asset")]
     public class InventoryAsset : ScriptableObject, IInventory, ISerializationCallbackReceiver
     {
-        public IReadOnlyList<IInventoryItem> Items => items;
-
         public int Count => items.Count;
 
         public IInventoryItem this[int i]
@@ -22,6 +20,8 @@ namespace HHG.InventorySystem.Runtime
                 items[i] = value;
             }
         }
+
+        public IReadOnlyList<IInventoryItem> Items => items;
 
         [SerializeField, Filter(typeof(IInventoryItem))] private List<ScriptableObject> _items = new List<ScriptableObject>();
 

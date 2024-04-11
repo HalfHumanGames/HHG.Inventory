@@ -8,6 +8,7 @@ namespace HHG.InventorySystem.Runtime
     public class InventoryController : MonoBehaviour
     {
         public UIInventory UI => uiInventory;
+        public IReadOnlyList<IInventoryItem> Items => inventory.Items;
 
         [SerializeField] private InventoryAsset _inventory;
         
@@ -15,6 +16,8 @@ namespace HHG.InventorySystem.Runtime
         private IInventory inventory;
 
         public UnityEvent<IInventory> OnUpdated;
+        public UnityEvent<IInventory, IInventoryItem> OnItemAdded;
+        public UnityEvent<IInventory, IInventoryItem> OnItemRemoved;
 
         private void Awake()
         {
@@ -42,21 +45,35 @@ namespace HHG.InventorySystem.Runtime
 
         public void SetItem(int index, IInventoryItem item)
         {
+            IInventoryItem removed = inventory[index];
+            IInventoryItem added = item;
             inventory[index] = item;
             uiInventory.Refresh(inventory);
             OnUpdated?.Invoke(inventory);
+            if (removed != null)
+            {
+                OnItemRemoved?.Invoke(inventory, removed);
+            }
+            if (added != null)
+            {
+                OnItemAdded?.Invoke(inventory, added);
+            }
         }
 
         public int AddItem(IInventoryItem item)
         {
-            for (int i = 0; i < inventory.Count; i++)
+            if (item != null)
             {
-                if (inventory[i] == null)
+                for (int i = 0; i < inventory.Count; i++)
                 {
-                    inventory[i] = item;
-                    uiInventory.Refresh(inventory);
-                    OnUpdated?.Invoke(inventory);
-                    return i;
+                    if (inventory[i] == null)
+                    {
+                        inventory[i] = item;
+                        uiInventory.Refresh(inventory);
+                        OnUpdated?.Invoke(inventory);
+                        OnItemAdded?.Invoke(inventory, item);
+                        return i;
+                    }
                 }
             }
 
@@ -67,6 +84,26 @@ namespace HHG.InventorySystem.Runtime
         {
             index = AddItem(item);
             return index >= 0;
+        }
+
+        public bool RemoveItem(IInventoryItem item)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < inventory.Count; i++)
+                {
+                    if (inventory[i] == item)
+                    {
+                        inventory[i] = null;
+                        uiInventory.Refresh(inventory);
+                        OnUpdated?.Invoke(inventory);
+                        OnItemRemoved?.Invoke(inventory, item);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
