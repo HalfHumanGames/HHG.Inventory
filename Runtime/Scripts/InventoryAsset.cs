@@ -23,7 +23,7 @@ namespace HHG.InventorySystem.Runtime
 
         public IReadOnlyList<IInventoryItem> Items => items;
 
-        [SerializeField, Filter(typeof(IInventoryItem))] private List<ScriptableObject> _items = new List<ScriptableObject>();
+        [SerializeField, Dropdown(typeof(IInventoryItem))] private List<ScriptableObject> _items = new List<ScriptableObject>();
 
         private List<IInventoryItem> items = new List<IInventoryItem>();
 
