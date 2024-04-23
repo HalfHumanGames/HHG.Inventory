@@ -9,7 +9,7 @@ namespace HHG.InventorySystem.Runtime
     public class UIInventoryItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, ITooltip
     {
         public IInventoryItem Item => item;
-        public string TooltipText => item.TooltipText;
+        public string TooltipText => item?.TooltipText ?? string.Empty;
 
         [SerializeField] private Image ItemIcon;
         [SerializeField] private Image ItemBackground;

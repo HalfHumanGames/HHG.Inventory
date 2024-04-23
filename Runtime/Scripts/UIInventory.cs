@@ -88,7 +88,9 @@ namespace HHG.InventorySystem.Runtime
 
             while (slots.Count < max)
             {
-                slots.Add(Instantiate(slotPrefab, container));
+                UIInventorySlot slot = Instantiate(slotPrefab, container);
+                slot.Refresh(null);
+                slots.Add(slot);
             }
 
             while (container.childCount > max)
