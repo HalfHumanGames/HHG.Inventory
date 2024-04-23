@@ -12,6 +12,7 @@ namespace HHG.InventorySystem.Runtime
         public string TooltipText => item.TooltipText;
 
         [SerializeField] private Image ItemIcon;
+        [SerializeField] private Image ItemBackground;
 
         private IInventoryItem item;
         private Canvas canvas;
@@ -28,8 +29,17 @@ namespace HHG.InventorySystem.Runtime
         public void Refresh(IInventoryItem inventoryItem)
         {
             item = inventoryItem;
+
             ItemIcon.sprite = item?.Icon;
             ItemIcon.enabled = item?.Icon;
+            ItemIcon.color = item?.IconColor ?? Color.white;
+
+            if (ItemBackground != null)
+            {
+                ItemBackground.sprite = item?.Background;
+                ItemBackground.enabled = item?.Background;
+                ItemBackground.color = item?.BackgroundColor ?? Color.white;
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData)
