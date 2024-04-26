@@ -93,7 +93,7 @@ namespace HHG.InventorySystem.Runtime
                 slots.Add(slot);
             }
 
-            while (container.childCount > max)
+            while (slots.Count > max)
             {
                 int last = slots.Count - 1;
                 UIInventorySlot slot = slots[last];
