@@ -40,7 +40,7 @@ namespace HHG.InventorySystem.Runtime
 
         public Inventory(IEnumerable<IInventoryItem> enumerable, int size = -1)
         {
-            items = new List<IInventoryItem>();
+            items = new List<IInventoryItem>(enumerable);
             if (size > items.Count)
             {
                 items.Resize(size);
@@ -53,6 +53,8 @@ namespace HHG.InventorySystem.Runtime
             items.Swap(i, j);
         }
 
-        public IEnumerator GetEnumerator() => items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+
+        public IEnumerator<IInventoryItem> GetEnumerator() => items.GetEnumerator();
     }
 }

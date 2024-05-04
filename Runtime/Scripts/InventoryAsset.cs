@@ -45,6 +45,8 @@ namespace HHG.InventorySystem.Runtime
             _items.AddRange(items.Select(i => i as ScriptableObject));
         }
 
-        public IEnumerator GetEnumerator() => items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+
+        public IEnumerator<IInventoryItem> GetEnumerator() => items.GetEnumerator();
     }
 }

@@ -60,6 +60,14 @@ namespace HHG.InventorySystem.Runtime
             }
         }
 
+        public void AddItems(IEnumerable<IInventoryItem> items)
+        {
+            foreach (IInventoryItem item in items)
+            {
+                AddItem(item);
+            }
+        }
+
         public int AddItem(IInventoryItem item)
         {
             if (item != null)
@@ -84,6 +92,14 @@ namespace HHG.InventorySystem.Runtime
         {
             index = AddItem(item);
             return index >= 0;
+        }
+
+        public void RemoveItems(IEnumerable<IInventoryItem> items)
+        {
+            foreach (IInventoryItem item in items)
+            {
+                RemoveItem(item);
+            }
         }
 
         public bool RemoveItem(IInventoryItem item)
