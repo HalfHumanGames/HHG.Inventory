@@ -14,6 +14,7 @@ namespace HHG.InventorySystem.Runtime
         
         private UIInventory uiInventory;
         private IInventory inventory;
+        private List<IInventoryDropHandler> dropHandlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
 
         public UnityEvent<IInventory> OnUpdated;
         public UnityEvent<IInventory, IInventoryItem> OnItemAdded;
@@ -34,6 +35,23 @@ namespace HHG.InventorySystem.Runtime
         {
             inventory = value;
             uiInventory.Refresh(inventory);
+        }
+
+        public void AddHandler(IInventoryDropHandler handler)
+        {
+            dropHandlers.Add(handler);
+        }
+
+        public void HandleDrop(UIInventorySlot from,  UIInventorySlot to)
+        {
+            for (int i = dropHandlers.Count - 1; i >= 0; i--)
+            {
+                if (dropHandlers[i].CanHandleDrop(from, to))
+                {
+                    dropHandlers[i].HandleDrop(from, to);
+                    break;
+                }
+            }
         }
 
         public void SwapItems(int from, int to)

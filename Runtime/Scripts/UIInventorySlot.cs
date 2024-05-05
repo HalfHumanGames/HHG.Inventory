@@ -6,11 +6,11 @@ namespace HHG.InventorySystem.Runtime
 {
     public class UIInventorySlot : MonoBehaviour, IDropHandler
     {
-        public IInventoryItem Item => item;
+        public IInventoryItem Item => inventoryItem;
 
         [SerializeField] private UIInventoryItem uiInventoryItem;
 
-        private IInventoryItem item;
+        private IInventoryItem inventoryItem;
         private InventoryController _controller;
         public InventoryController Controller
         {
@@ -26,28 +26,15 @@ namespace HHG.InventorySystem.Runtime
 
         public void Refresh(IInventoryItem inventoryItem)
         {
-            item = inventoryItem;
-            uiInventoryItem.Refresh(item);
+            this.inventoryItem = inventoryItem;
+            uiInventoryItem.Refresh(this.inventoryItem);
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot other))
+            if (eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
             {
-                int from = other.transform.GetSiblingIndex();
-                int to = transform.GetSiblingIndex();
-
-                if (Controller == other.Controller)
-                {
-                    Controller.SwapItems(from, to);
-                }
-                else
-                {
-                    IInventoryItem thisItem = Item;
-                    IInventoryItem otherItem = other.Item;
-                    Controller.SetItem(to, otherItem);
-                    other.Controller.SetItem(from, thisItem);
-                }
+                Controller.HandleDrop(from, this);
             }
         }
     }
