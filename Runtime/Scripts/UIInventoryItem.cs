@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace HHG.InventorySystem.Runtime
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class UIInventoryItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, ITooltip
+    public class UIInventoryItem : MonoBehaviour, IRefreshable<IInventoryItem>, IBeginDragHandler, IDragHandler, IEndDragHandler, ITooltip
     {
         public IInventoryItem Item => item;
         public string TooltipText => item?.TooltipText ?? string.Empty;

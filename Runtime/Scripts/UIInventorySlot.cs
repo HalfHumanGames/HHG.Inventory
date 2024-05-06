@@ -4,37 +4,43 @@ using UnityEngine.EventSystems;
 
 namespace HHG.InventorySystem.Runtime
 {
-    public class UIInventorySlot : MonoBehaviour, IDropHandler
+    public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler
     {
         public IInventoryItem Item => inventoryItem;
-
-        [SerializeField] private UIInventoryItem uiInventoryItem;
+        public InventoryController Controller => controller.FromComponentInParent(this);
+        public T ItemAs<T>() where T : class, IInventoryItem => inventoryItem as T;
+        public int Index => transform.GetSiblingIndex();
 
         private IInventoryItem inventoryItem;
-        private InventoryController _controller;
-        public InventoryController Controller
+        private Lazy<InventoryController> controller = new Lazy<InventoryController>();
+        private IRefreshable<IInventoryItem>[] refreshables;
+
+        private void Awake()
         {
-            get
-            {
-                if (_controller == null)
-                {
-                    _controller = GetComponentInParent<InventoryController>();
-                }
-                return _controller;
-            }
+            refreshables = GetComponentsInChildren<IRefreshable<IInventoryItem>>();
         }
 
         public void Refresh(IInventoryItem inventoryItem)
         {
             this.inventoryItem = inventoryItem;
-            uiInventoryItem.Refresh(this.inventoryItem);
+
+            foreach (IRefreshable<IInventoryItem> refreshable in refreshables)
+            {
+                if (refreshable != this as IRefreshable<IInventoryItem>)
+                {
+                    refreshable.Refresh(inventoryItem);
+                }
+            }
         }
 
         public void OnDrop(PointerEventData eventData)
         {
             if (eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
             {
-                Controller.HandleDrop(from, this);
+                if (from != this)
+                {
+                    Controller.HandleDrop(from, this);
+                }
             }
         }
     }

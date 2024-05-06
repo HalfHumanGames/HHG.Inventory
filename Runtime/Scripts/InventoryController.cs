@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using HHG.Common.Runtime;
 
 namespace HHG.InventorySystem.Runtime
 {
@@ -10,15 +11,22 @@ namespace HHG.InventorySystem.Runtime
         public UIInventory UI => uiInventory;
         public IReadOnlyList<IInventoryItem> Items => inventory.Items;
 
+        [SerializeField] private StartAction startAction;
         [SerializeField] private InventoryAsset _inventory;
         
         private UIInventory uiInventory;
         private IInventory inventory;
-        private List<IInventoryDropHandler> dropHandlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
+        private List<IInventoryDropHandler> handlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
 
         public UnityEvent<IInventory> OnUpdated;
         public UnityEvent<IInventory, IInventoryItem> OnItemAdded;
         public UnityEvent<IInventory, IInventoryItem> OnItemRemoved;
+
+        private enum StartAction
+        {
+            Show,
+            Hide
+        }
 
         private void Awake()
         {
@@ -29,6 +37,12 @@ namespace HHG.InventorySystem.Runtime
         private void Start()
         {
             uiInventory.Refresh(inventory);
+
+            switch(startAction)
+            {
+                case StartAction.Show: uiInventory.Show(); break;
+                case StartAction.Hide: uiInventory.Hide(); break;
+            }
         }
 
         public void SetInventory(IInventory value)
@@ -39,16 +53,21 @@ namespace HHG.InventorySystem.Runtime
 
         public void AddHandler(IInventoryDropHandler handler)
         {
-            dropHandlers.Add(handler);
+            handlers.Add(handler);
+        }
+
+        public void RemoveHandler<T>() where T : IInventoryDropHandler
+        {
+            handlers.Remove(h => h.GetType() == typeof(T));
         }
 
         public void HandleDrop(UIInventorySlot from,  UIInventorySlot to)
         {
-            for (int i = dropHandlers.Count - 1; i >= 0; i--)
+            for (int i = handlers.Count - 1; i >= 0; i--)
             {
-                if (dropHandlers[i].CanHandleDrop(from, to))
+                if (handlers[i].CanHandleDrop(from, to))
                 {
-                    dropHandlers[i].HandleDrop(from, to);
+                    handlers[i].HandleDrop(from, to);
                     break;
                 }
             }

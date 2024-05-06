@@ -1,13 +1,15 @@
+using HHG.Common.Runtime;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace HHG.InventorySystem.Runtime
 {
     [ExecuteInEditMode, RequireComponent(typeof(CanvasGroup)), SelectionBase]
-    public class UIInventory : MonoBehaviour
+    public class UIInventory : MonoBehaviour, IRefreshable<IInventory>
     {
+        public IReadOnlyList<UIInventorySlot> Slots => slots;
+
         [SerializeField] private Vector2Int gridSize;
         [SerializeField] private Vector2Int slotSize;
         [SerializeField] private int padding;
@@ -19,10 +21,13 @@ namespace HHG.InventorySystem.Runtime
 
         private CanvasGroup canvasGroup;
         private List<UIInventorySlot> slots = new List<UIInventorySlot>();
+        private IRefreshable<IInventory>[] refreshables;
 
         private void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();
+
+            refreshables = GetComponentsInChildren<IRefreshable<IInventory>>();
 
             if (Application.isPlaying)
             {
@@ -68,6 +73,14 @@ namespace HHG.InventorySystem.Runtime
 
         public void Refresh(IInventory inventory)
         {
+            foreach (IRefreshable<IInventory> refreshable in refreshables)
+            {
+                if (refreshable != this as IRefreshable<IInventory>)
+                {
+                    refreshable.Refresh(inventory);
+                }
+            }
+
             for (int i = 0; i < slots.Count; i++)
             {
                 if (i < inventory.Count)
