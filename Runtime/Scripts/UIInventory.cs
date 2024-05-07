@@ -19,16 +19,14 @@ namespace HHG.InventorySystem.Runtime
         [SerializeField] private UIInventorySlot slotPrefab;
         [SerializeField] private GridLayoutGroup slotContainer;
 
-        private CanvasGroup canvasGroup;
+        private Lazy<CanvasGroup> _canvasGroup = new Lazy<CanvasGroup>();
+        private CanvasGroup canvasGroup => _canvasGroup.FromComponent(this);
         private List<UIInventorySlot> slots = new List<UIInventorySlot>();
-        private IRefreshable<IInventory>[] refreshables;
+        private Lazy<IRefreshable<IInventory>> _refreshables = new Lazy<IRefreshable<IInventory>>();
+        private IRefreshable<IInventory>[] refreshables => _refreshables.FromComponentsInChildren(this);
 
         private void Awake()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
-
-            refreshables = GetComponentsInChildren<IRefreshable<IInventory>>();
-
             if (Application.isPlaying)
             {
                 CreateSlots();

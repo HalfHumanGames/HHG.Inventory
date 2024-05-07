@@ -1,7 +1,7 @@
+using HHG.Common.Runtime;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using HHG.Common.Runtime;
 
 namespace HHG.InventorySystem.Runtime
 {
@@ -13,8 +13,9 @@ namespace HHG.InventorySystem.Runtime
 
         [SerializeField] private StartAction startAction;
         [SerializeField] private InventoryAsset _inventory;
-        
-        private UIInventory uiInventory;
+
+        private Lazy<UIInventory> _uiInventory = new Lazy<UIInventory>();
+        private UIInventory uiInventory => _uiInventory.FromComponent(this);
         private IInventory inventory;
         private List<IInventoryDropHandler> handlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
 
@@ -30,15 +31,14 @@ namespace HHG.InventorySystem.Runtime
 
         private void Awake()
         {
-            uiInventory = GetComponent<UIInventory>();
-            inventory = _inventory == null ? new Inventory() : new Inventory(new List<IInventoryItem>(_inventory.Items));
+            inventory ??= _inventory == null ? new Inventory() : new Inventory(new List<IInventoryItem>(_inventory.Items));
         }
 
         private void Start()
         {
             uiInventory.Refresh(inventory);
 
-            switch(startAction)
+            switch (startAction)
             {
                 case StartAction.Show: uiInventory.Show(); break;
                 case StartAction.Hide: uiInventory.Hide(); break;
@@ -61,7 +61,7 @@ namespace HHG.InventorySystem.Runtime
             handlers.Remove(h => h.GetType() == typeof(T));
         }
 
-        public void HandleDrop(UIInventorySlot from,  UIInventorySlot to)
+        public void HandleDrop(UIInventorySlot from, UIInventorySlot to)
         {
             for (int i = handlers.Count - 1; i >= 0; i--)
             {
