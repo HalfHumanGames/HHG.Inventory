@@ -68,6 +68,22 @@ namespace HHG.InventorySystem.Runtime
             }
         }
 
+        public void Set(IEnumerable<IInventoryItem> enumerable)
+        {
+            int i = 0;
+
+            foreach (IInventoryItem item in enumerable)
+            {
+                this[i++] = item;
+            }
+
+            while (i < Count)
+            {
+                this[i] = null;
+                items.RemoveAt(i);
+            }
+        }
+
         public void Swap(int i, int j)
         {
             IInventoryItem temp = this[i];
