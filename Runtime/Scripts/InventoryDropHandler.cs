@@ -6,15 +6,15 @@ namespace HHG.InventorySystem.Runtime
         {
             if (from.Controller == to.Controller)
             {
-                from.Controller.SwapItems(from.Index, to.Index);
+                from.Controller.Inventory.Swap(from.Index, to.Index);
             }
             else
             {
                 // Can't pass directly since SetItem updates the slot
                 IInventoryItem fromItem = from.Item;
                 IInventoryItem toItem = to.Item;
-                from.Controller.SetItem(from.Index, toItem);
-                to.Controller.SetItem(to.Index, fromItem);
+                from.Controller.Inventory[from.Index] = toItem;
+                to.Controller.Inventory[to.Index] = fromItem;
             }
         }
     }

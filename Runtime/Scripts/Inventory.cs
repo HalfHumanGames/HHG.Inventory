@@ -1,4 +1,5 @@
 using HHG.Common.Runtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,12 @@ namespace HHG.InventorySystem.Runtime
     public class Inventory : IInventory
     {
         public int Count => items.Count;
+        public bool IsReadOnly => false;
+        public IEnumerable<IInventoryItem> Items => items.NotNull();
+
+        public event Action<IInventory> Updated;
+        public event Action<IInventory, IInventoryItem> ItemAdded;
+        public event Action<IInventory, IInventoryItem> ItemRemoved;
 
         public IInventoryItem this[int i]
         {
@@ -15,11 +22,25 @@ namespace HHG.InventorySystem.Runtime
             set
             {
                 items.Resize(Mathf.Max(items.Count, i + 1));
+
+                IInventoryItem added = value;
+                IInventoryItem removed = items[i];
+
                 items[i] = value;
+
+                if (added != null)
+                {
+                    ItemAdded?.Invoke(this, added);
+                }
+
+                if (removed != null)
+                {
+                    ItemRemoved?.Invoke(this, removed);
+                }
+
+                Updated?.Invoke(this);
             }
         }
-
-        public IReadOnlyList<IInventoryItem> Items => items;
 
         private List<IInventoryItem> items;
 
@@ -32,7 +53,7 @@ namespace HHG.InventorySystem.Runtime
         public Inventory(List<IInventoryItem> list, int size = -1)
         {
             items = list;
-            if (size > items.Count)
+            if (size > Count)
             {
                 items.Resize(size);
             }
@@ -41,7 +62,7 @@ namespace HHG.InventorySystem.Runtime
         public Inventory(IEnumerable<IInventoryItem> enumerable, int size = -1)
         {
             items = new List<IInventoryItem>(enumerable);
-            if (size > items.Count)
+            if (size > Count)
             {
                 items.Resize(size);
             }
@@ -49,8 +70,93 @@ namespace HHG.InventorySystem.Runtime
 
         public void Swap(int i, int j)
         {
-            items.Resize(Mathf.Max(items.Count, i + 1, j + 1));
-            items.Swap(i, j);
+            IInventoryItem temp = this[i];
+            this[i] = this[j];
+            this[j] = temp;
+        }
+
+        public bool TryAdd(IInventoryItem item, out int index)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    if (this[i] == null)
+                    {
+                        this[i] = item;
+                        index = i;
+                        return true;
+                    }
+                }
+            }
+
+            index = -1;
+            return false;
+        }
+
+        public int IndexOf(IInventoryItem item)
+        {
+            return items.IndexOf(item);
+        }
+
+        public void Insert(int index, IInventoryItem item)
+        {
+            this[index] = item;
+        }
+
+        public void RemoveAt(int index)
+        {
+            this[index] = null;
+        }
+
+        public void Add(IInventoryItem item)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    if (this[i] == null)
+                    {
+                        this[i] = item;
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void Clear()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                this[i] = null;
+            }
+        }
+
+        public bool Contains(IInventoryItem item)
+        {
+            return items.Contains(item);
+        }
+
+        public void CopyTo(IInventoryItem[] array, int arrayIndex)
+        {
+            items.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(IInventoryItem item)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    if (this[i] == item)
+                    {
+                        this[i] = null;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();

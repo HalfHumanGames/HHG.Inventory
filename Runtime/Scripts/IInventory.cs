@@ -1,12 +1,23 @@
+using System;
 using System.Collections.Generic;
 
 namespace HHG.InventorySystem.Runtime
 {
-    public interface IInventory : IEnumerable<IInventoryItem>
+    public interface IInventory : IList<IInventoryItem>
     {
-        public int Count { get; }
-        public IInventoryItem this[int i] { get; set; }
-        public IReadOnlyList<IInventoryItem> Items { get; }
-        public void Swap(int i, int j);
+        IEnumerable<IInventoryItem> Items { get; }
+        void Swap(int i, int j);
+        bool TryAdd(IInventoryItem item, out int i);
+        event Action<IInventory> Updated;
+        event Action<IInventory, IInventoryItem> ItemAdded;
+        event Action<IInventory, IInventoryItem> ItemRemoved;
+    }
+
+    public static class IInventoryExtensions
+    {
+        public static bool TryAdd(this IInventory inventory, IInventoryItem item)
+        {
+            return inventory.TryAdd(item, out _);
+        }
     }
 }

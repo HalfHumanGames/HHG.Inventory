@@ -9,7 +9,11 @@ namespace HHG.InventorySystem.Runtime
     public class InventoryController : MonoBehaviour
     {
         public UIInventory UI => uiInventory;
-        public IReadOnlyList<IInventoryItem> Items => inventory.Items;
+        public IInventory Inventory => inventory;
+
+        public UnityEvent<IInventory> OnUpdated;
+        public UnityEvent<IInventory, IInventoryItem> OnItemAdded;
+        public UnityEvent<IInventory, IInventoryItem> OnItemRemoved;
 
         [SerializeField] private StartAction startAction;
         [SerializeField] private InventoryAsset _inventory;
@@ -18,10 +22,6 @@ namespace HHG.InventorySystem.Runtime
         private UIInventory uiInventory => _uiInventory.FromComponent(this);
         private IInventory inventory;
         private List<IInventoryDropHandler> handlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
-
-        public UnityEvent<IInventory> OnUpdated;
-        public UnityEvent<IInventory, IInventoryItem> OnItemAdded;
-        public UnityEvent<IInventory, IInventoryItem> OnItemRemoved;
 
         private enum StartAction
         {
@@ -32,6 +32,7 @@ namespace HHG.InventorySystem.Runtime
         private void Awake()
         {
             inventory ??= _inventory == null ? new Inventory() : new Inventory(new List<IInventoryItem>(_inventory.Items));
+            SetInventory(inventory);
         }
 
         private void Start()
@@ -47,7 +48,9 @@ namespace HHG.InventorySystem.Runtime
 
         public void SetInventory(IInventory value)
         {
+            Unsubscribe();
             inventory = value;
+            Subscribe();
             uiInventory.Refresh(inventory);
         }
 
@@ -73,90 +76,31 @@ namespace HHG.InventorySystem.Runtime
             }
         }
 
-        public void SwapItems(int from, int to)
+        private void Subscribe()
         {
-            inventory.Swap(from, to);
-            uiInventory.Refresh(inventory);
-            OnUpdated?.Invoke(inventory);
-        }
-
-        public void SetItem(int index, IInventoryItem item)
-        {
-            IInventoryItem removed = inventory[index];
-            IInventoryItem added = item;
-            inventory[index] = item;
-            uiInventory.Refresh(inventory);
-            OnUpdated?.Invoke(inventory);
-            if (removed != null)
+            if (inventory != null)
             {
-                OnItemRemoved?.Invoke(inventory, removed);
-            }
-            if (added != null)
-            {
-                OnItemAdded?.Invoke(inventory, added);
+                inventory.Updated += uiInventory.Refresh;
+                inventory.Updated += OnUpdated.Invoke;
+                inventory.ItemAdded += OnItemAdded.Invoke;
+                inventory.ItemRemoved += OnItemRemoved.Invoke;
             }
         }
 
-        public void AddItems(IEnumerable<IInventoryItem> items)
+        private void Unsubscribe()
         {
-            foreach (IInventoryItem item in items)
+            if (inventory != null)
             {
-                AddItem(item);
+                inventory.Updated -= uiInventory.Refresh;
+                inventory.Updated -= OnUpdated.Invoke;
+                inventory.ItemAdded -= OnItemAdded.Invoke;
+                inventory.ItemRemoved -= OnItemRemoved.Invoke;
             }
         }
 
-        public int AddItem(IInventoryItem item)
-        {
-            if (item != null)
-            {
-                for (int i = 0; i < inventory.Count; i++)
-                {
-                    if (inventory[i] == null)
-                    {
-                        inventory[i] = item;
-                        uiInventory.Refresh(inventory);
-                        OnUpdated?.Invoke(inventory);
-                        OnItemAdded?.Invoke(inventory, item);
-                        return i;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-        public bool TryAddItem(IInventoryItem item, out int index)
-        {
-            index = AddItem(item);
-            return index >= 0;
-        }
-
-        public void RemoveItems(IEnumerable<IInventoryItem> items)
-        {
-            foreach (IInventoryItem item in items)
-            {
-                RemoveItem(item);
-            }
-        }
-
-        public bool RemoveItem(IInventoryItem item)
-        {
-            if (item != null)
-            {
-                for (int i = 0; i < inventory.Count; i++)
-                {
-                    if (inventory[i] == item)
-                    {
-                        inventory[i] = null;
-                        uiInventory.Refresh(inventory);
-                        OnUpdated?.Invoke(inventory);
-                        OnItemRemoved?.Invoke(inventory, item);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+        private void OnDestroy()
+        {      
+            Unsubscribe();
         }
     }
 }
