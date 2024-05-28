@@ -11,5 +11,11 @@ namespace HHG.InventorySystem.Runtime
         public IEnumerable<IInventoryItem> Items => items.Cast<IInventoryItem>();
 
         [SerializeField, Dropdown(typeof(IInventoryItem))] private List<ScriptableObject> items = new List<ScriptableObject>();
+
+        public void SetItems(IEnumerable<IInventoryItem> enumerable)
+        {
+            items.Clear();
+            items.AddRange(enumerable.Cast<ScriptableObject>());
+        }
     }
 }

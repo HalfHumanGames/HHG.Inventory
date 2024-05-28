@@ -2,7 +2,6 @@ using HHG.Common.Runtime;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 namespace HHG.InventorySystem.Runtime
 {
@@ -179,8 +178,8 @@ namespace HHG.InventorySystem.Runtime
                 RectTransform hRect = hbar.GetComponent<RectTransform>();
                 RectTransform vRect = vbar.GetComponent<RectTransform>();
 
-                float addx = viewSize.x == gridSize.x ? 0 : hRect.sizeDelta.y;
-                float addy = viewSize.y == gridSize.y ? 0 : vRect.sizeDelta.x;
+                float addx = viewSize.y == gridSize.y ? 0 : vRect.sizeDelta.x;
+                float addy = viewSize.x == gridSize.x ? 0 : hRect.sizeDelta.y;
 
                 rect.sizeDelta = new Vector2(
                     (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addx,
