@@ -91,6 +91,11 @@ namespace HHG.InventorySystem.Runtime
             this[j] = temp;
         }
 
+        public void Resize(int size)
+        {
+            items.Resize(size);
+        }
+
         public bool TryAdd(IInventoryItem item, out int index)
         {
             if (item != null)
