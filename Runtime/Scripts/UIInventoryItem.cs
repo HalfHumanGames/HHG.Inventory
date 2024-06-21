@@ -1,6 +1,7 @@
 using HHG.Common.Runtime;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace HHG.InventorySystem.Runtime
@@ -11,8 +12,9 @@ namespace HHG.InventorySystem.Runtime
         public IInventoryItem Item => item;
         public string TooltipText => item?.TooltipText ?? string.Empty;
 
-        [SerializeField] private Image ItemIcon;
-        [SerializeField] private Image ItemBackground;
+        [SerializeField, FormerlySerializedAs("ItemIcon")] private Image icon;
+        [SerializeField, FormerlySerializedAs("ItemBackground")] private Image background;
+        [SerializeField] private ActionEvent onBeginDrag = new ActionEvent();
 
         private IInventoryItem item;
         private Canvas canvas;
@@ -30,15 +32,15 @@ namespace HHG.InventorySystem.Runtime
         {
             item = inventoryItem;
 
-            ItemIcon.sprite = item?.Icon;
-            ItemIcon.enabled = item?.Icon;
-            ItemIcon.color = item?.IconColor ?? Color.white;
+            icon.sprite = item?.Icon;
+            icon.enabled = item?.Icon;
+            icon.color = item?.IconColor ?? Color.white;
 
-            if (ItemBackground != null)
+            if (background != null)
             {
-                ItemBackground.sprite = item?.Background;
-                ItemBackground.enabled = item?.Background;
-                ItemBackground.color = item?.BackgroundColor ?? Color.white;
+                background.sprite = item?.Background;
+                background.enabled = item?.Background;
+                background.color = item?.BackgroundColor ?? Color.white;
             }
         }
 
@@ -46,6 +48,7 @@ namespace HHG.InventorySystem.Runtime
         {
             canvasGroup.alpha = .6f;
             canvasGroup.blocksRaycasts = false;
+            onBeginDrag?.Invoke(this);
         }
 
         public void OnDrag(PointerEventData eventData)
