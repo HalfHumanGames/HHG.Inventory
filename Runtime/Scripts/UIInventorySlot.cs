@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 namespace HHG.InventorySystem.Runtime
 {
-    public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler
+    public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public IInventoryItem Item => inventoryItem;
         public InventoryController Controller => controller.FromComponentInParent(this);
@@ -40,6 +40,28 @@ namespace HHG.InventorySystem.Runtime
                 if (from != this)
                 {
                     Controller.HandleDrop(from, this);
+                }
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            {
+                if (from != this)
+                {
+                    Controller.HandleDragEnter(from, this);
+                }
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            {
+                if (from != this)
+                {
+                    Controller.HandleDragExit(from, this);
                 }
             }
         }
