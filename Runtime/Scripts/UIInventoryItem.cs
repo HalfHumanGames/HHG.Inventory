@@ -11,21 +11,25 @@ namespace HHG.InventorySystem.Runtime
     {
         public IInventoryItem Item => item;
         public string TooltipText => item?.TooltipText ?? string.Empty;
+        public UIInventorySlot Slot => slot;
 
         [SerializeField, FormerlySerializedAs("ItemIcon")] private Image icon;
         [SerializeField, FormerlySerializedAs("ItemBackground")] private Image background;
         [SerializeField] private ActionEvent onBeginDrag = new ActionEvent();
+        [SerializeField] private ActionEvent onEndDrag = new ActionEvent();
 
         private IInventoryItem item;
         private Canvas canvas;
         private RectTransform rect;
         private CanvasGroup canvasGroup;
+        private UIInventorySlot slot;
 
         private void Awake()
         {
-            canvas = GetComponentInParent<Canvas>();
+            canvas = GetComponentInParent<Canvas>(true);
             rect = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();
+            slot = GetComponentInParent<UIInventorySlot>(true);
         }
 
         public void Refresh(IInventoryItem inventoryItem)
@@ -46,7 +50,8 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            canvasGroup.alpha = .6f;
+            transform.SetParent(rect.root);
+            transform.SetAsLastSibling();
             canvasGroup.blocksRaycasts = false;
             onBeginDrag?.Invoke(this);
         }
@@ -58,9 +63,10 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            canvasGroup.alpha = 1f;
+            transform.SetParent(slot.transform);
             canvasGroup.blocksRaycasts = true;
             rect.anchoredPosition = Vector2.zero;
+            onEndDrag?.Invoke(this);
         }
     }
 }

@@ -11,8 +11,9 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            if (eventData.pointerDrag.TryGetComponent(out UIInventoryItem item))
             {
+                UIInventorySlot from = item.Slot;
                 UIInventorySlot to = Controller.UI.Slots.MinBy(s => Vector3.Distance(s.transform.position, from.transform.position));
 
                 if (from != to)
@@ -24,8 +25,9 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            if (eventData.pointerDrag.TryGetComponent(out UIInventoryItem item))
             {
+                UIInventorySlot from = item.Slot;
                 UIInventorySlot to = Controller.UI.Slots.MinBy(s => Vector3.Distance(s.transform.position, from.transform.position));
 
                 if (from != to)
@@ -37,8 +39,9 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponent(out UIInventoryItem item))
             {
+                UIInventorySlot from = item.Slot;
                 UIInventorySlot to = Controller.UI.Slots.MinBy(s => Vector3.Distance(s.transform.position, from.transform.position));
 
                 if (from != to)
@@ -50,8 +53,9 @@ namespace HHG.InventorySystem.Runtime
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponentInParent(out UIInventorySlot from))
+            if (eventData.pointerDrag && eventData.pointerDrag.TryGetComponent(out UIInventoryItem item))
             {
+                UIInventorySlot from = item.Slot;
                 UIInventorySlot to = Controller.UI.Slots.MinBy(s => Vector3.Distance(s.transform.position, from.transform.position));
 
                 if (from != to)
