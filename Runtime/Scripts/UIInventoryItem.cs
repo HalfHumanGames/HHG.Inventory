@@ -1,4 +1,5 @@
 using HHG.Common.Runtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -13,8 +14,10 @@ namespace HHG.InventorySystem.Runtime
         public string TooltipText => item?.TooltipText ?? string.Empty;
         public UIInventorySlot Slot => slot;
 
+        [SerializeField] private bool disableDrag;
         [SerializeField, FormerlySerializedAs("ItemIcon")] private Image icon;
         [SerializeField, FormerlySerializedAs("ItemBackground")] private Image background;
+        [SerializeField] private TextMeshProUGUI description;
         [SerializeField] private ActionEvent onBeginDrag = new ActionEvent();
         [SerializeField] private ActionEvent onEndDrag = new ActionEvent();
 
@@ -32,7 +35,7 @@ namespace HHG.InventorySystem.Runtime
             slot = GetComponentInParent<UIInventorySlot>(true);
         }
 
-        public void Refresh(IInventoryItem inventoryItem)
+        public virtual void Refresh(IInventoryItem inventoryItem)
         {
             item = inventoryItem;
 
@@ -46,27 +49,41 @@ namespace HHG.InventorySystem.Runtime
                 background.enabled = item?.Background;
                 background.color = item?.BackgroundColor ?? Color.white;
             }
+
+            if (description != null)
+            {
+                description.text = item?.TooltipText;
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            transform.SetParent(rect.root);
-            transform.SetAsLastSibling();
-            canvasGroup.blocksRaycasts = false;
-            onBeginDrag?.Invoke(this);
+            if (!disableDrag)
+            {
+                transform.SetParent(rect.root);
+                transform.SetAsLastSibling();
+                canvasGroup.blocksRaycasts = false;
+                onBeginDrag?.Invoke(this);
+            }
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
+            if (!disableDrag)
+            {
+                rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            transform.SetParent(slot.transform);
-            canvasGroup.blocksRaycasts = true;
-            rect.anchoredPosition = Vector2.zero;
-            onEndDrag?.Invoke(this);
+            if (!disableDrag)
+            {
+                transform.SetParent(slot.transform);
+                canvasGroup.blocksRaycasts = true;
+                rect.anchoredPosition = Vector2.zero;
+                onEndDrag?.Invoke(this);
+            }
         }
     }
 }
