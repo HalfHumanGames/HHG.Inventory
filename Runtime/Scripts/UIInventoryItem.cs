@@ -85,5 +85,15 @@ namespace HHG.InventorySystem.Runtime
                 onEndDrag?.Invoke(this);
             }
         }
+
+        public void EnableDrag()
+        {
+            disableDrag = false;
+        }
+
+        public void DisableDrag()
+        {
+            disableDrag = true;
+        }
     }
 }
