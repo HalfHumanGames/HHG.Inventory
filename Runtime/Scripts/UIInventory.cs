@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace HHG.InventorySystem.Runtime
 {
-    [ExecuteInEditMode, RequireComponent(typeof(CanvasGroup)), SelectionBase]
+    [ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(CanvasGroup)), SelectionBase]
     public class UIInventory : MonoBehaviour, IRefreshable<IInventory>
     {
         public IReadOnlyList<UIInventorySlot> Slots => slots;
