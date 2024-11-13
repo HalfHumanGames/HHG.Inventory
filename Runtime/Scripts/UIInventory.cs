@@ -149,7 +149,7 @@ namespace HHG.InventorySystem.Runtime
                 while (container.childCount < count)
                 {
                     UIInventorySlot slot = Instantiate(slotPrefab, container);
-                    slot.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.HideInHierarchy;
+                    slot.gameObject.hideFlags = HideFlags.DontSaveInEditor;
                 }
 
                 while (container.childCount > count)
@@ -178,12 +178,12 @@ namespace HHG.InventorySystem.Runtime
                 RectTransform hRect = hbar.GetComponent<RectTransform>();
                 RectTransform vRect = vbar.GetComponent<RectTransform>();
 
-                float addx = viewSize.y == gridSize.y ? 0 : vRect.sizeDelta.x;
-                float addy = viewSize.x == gridSize.x ? 0 : hRect.sizeDelta.y;
+                float addx = viewSize.y == gridSize.y ? 0f : vRect.sizeDelta.x;
+                float addy = viewSize.x == gridSize.x ? 0f : hRect.sizeDelta.y;
 
                 rect.sizeDelta = new Vector2(
                     (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addx,
-                    (viewSize.y * slotSize.y) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addy
+                    (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing) + (slotPadding * 2) + addy
                 );
             }
 
