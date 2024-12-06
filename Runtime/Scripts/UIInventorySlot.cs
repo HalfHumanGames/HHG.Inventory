@@ -1,26 +1,30 @@
 using HHG.Common.Runtime;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace HHG.InventorySystem.Runtime
 {
-    [RequireComponent(typeof(EventTrigger))]
+    [RequireComponent(typeof(Selectable), typeof(EventTrigger))]
     public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public IInventoryItem Item => inventoryItem;
         public InventoryController Controller => controller.FromComponentInParent(this);
         public T ItemAs<T>() where T : class, IInventoryItem => inventoryItem as T;
         public int Index => transform.GetSiblingIndex();
+        public Selectable Selectable => selectable;
         public EventTrigger EventTrigger => eventTrigger;
 
         private IInventoryItem inventoryItem;
         private Lazy<InventoryController> controller = new Lazy<InventoryController>();
         private IRefreshable<IInventoryItem>[] refreshables;
+        private Selectable selectable;
         private EventTrigger eventTrigger;
 
         private void Awake()
         {
             refreshables = GetComponentsInChildren<IRefreshable<IInventoryItem>>(true);
+            selectable = GetComponent<Selectable>();
             eventTrigger = GetComponent<EventTrigger>();
         }
 

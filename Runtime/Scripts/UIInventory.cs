@@ -1,5 +1,6 @@
 using HHG.Common.Runtime;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -186,6 +187,8 @@ namespace HHG.InventorySystem.Runtime
                     (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing) + (slotPadding * 2) + addy
                 );
             }
+
+            slots.Select(s => s.Selectable).SetNavigationGrid(gridSize.x);
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
         }
