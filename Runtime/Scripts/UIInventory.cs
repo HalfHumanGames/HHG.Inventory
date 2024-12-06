@@ -63,6 +63,14 @@ namespace HHG.InventorySystem.Runtime
             canvasGroup.blocksRaycasts = false;
         }
 
+        public void Select()
+        {
+            if (slots.FirstOrDefault() is UIInventorySlot firstSlot)
+            {
+                firstSlot.Selectable.Select();
+            }
+        }
+
         private void Update()
         {
             if (!Application.isPlaying) UpdateEditor();
