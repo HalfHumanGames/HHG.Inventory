@@ -9,6 +9,7 @@ namespace HHG.InventorySystem.Runtime
     [ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(CanvasGroup)), SelectionBase]
     public class UIInventory : MonoBehaviour, IRefreshable<IInventory>
     {
+        public bool IsVisible => isVisible;
         public IReadOnlyList<UIInventorySlot> Slots => slots;
 
         [SerializeField] private Vector2Int gridSize;
@@ -28,6 +29,7 @@ namespace HHG.InventorySystem.Runtime
         private List<UIInventorySlot> slots = new List<UIInventorySlot>();
         private Lazy<IRefreshable<IInventory>> _refreshables = new Lazy<IRefreshable<IInventory>>();
         private IRefreshable<IInventory>[] refreshables => _refreshables.FromComponentsInChildren(this);
+        private bool isVisible;
 
         private void Awake()
         {
@@ -51,6 +53,7 @@ namespace HHG.InventorySystem.Runtime
 
         public void Show()
         {
+            isVisible = true;
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
@@ -58,6 +61,7 @@ namespace HHG.InventorySystem.Runtime
 
         public void Hide()
         {
+            isVisible = false;
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
