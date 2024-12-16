@@ -9,23 +9,38 @@ namespace HHG.InventorySystem.Runtime
     public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public IInventoryItem Item => inventoryItem;
-        public InventoryController Controller => controller.FromComponentInParent(this);
+        public InventoryController Controller => controller;
         public T ItemAs<T>() where T : class, IInventoryItem => inventoryItem as T;
         public int Index => transform.GetSiblingIndex();
         public Selectable Selectable => selectable;
         public EventTrigger EventTrigger => eventTrigger;
 
-        private IInventoryItem inventoryItem;
-        private Lazy<InventoryController> controller = new Lazy<InventoryController>();
-        private IRefreshable<IInventoryItem>[] refreshables;
+        [SerializeField] private Vector2 gamepadDragOffset;
+
+        private UIInventoryItem uiInventoryItem;
         private Selectable selectable;
         private EventTrigger eventTrigger;
+        private Lazy<InventoryController> _controller = new Lazy<InventoryController>();
+        private InventoryController controller => _controller.FromComponentInParent(this);
+        private IInventoryItem inventoryItem;
+        private IRefreshable<IInventoryItem>[] refreshables;
 
         private void Awake()
         {
-            refreshables = GetComponentsInChildren<IRefreshable<IInventoryItem>>(true);
+            uiInventoryItem = GetComponentInChildren<UIInventoryItem>(true);
             selectable = GetComponent<Selectable>();
             eventTrigger = GetComponent<EventTrigger>();
+            refreshables = GetComponentsInChildren<IRefreshable<IInventoryItem>>(true);
+
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.Select;
+            entry.callback.AddListener(OnSelect);
+            eventTrigger.triggers.Add(entry);
+
+            EventTrigger.Entry entry2 = new EventTrigger.Entry();
+            entry2.eventID = EventTriggerType.Deselect;
+            entry2.callback.AddListener(OnDeselect);
+            eventTrigger.triggers.Add(entry2);
         }
 
         public void Refresh(IInventoryItem inventoryItem)
@@ -77,6 +92,33 @@ namespace HHG.InventorySystem.Runtime
                 {
                     Controller.HandleDragExit(from, this);
                 }
+            }
+        }
+
+        private void OnSelect(BaseEventData eventData)
+        {
+            if (UIInventoryItem.Dragged)
+            {
+                if (uiInventoryItem.TryGetComponent(out TooltipTrigger tooltipTrigger))
+                {
+                    tooltipTrigger.HideTooltip();
+                }
+
+                UIInventoryItem.Dragged.Rect.position = transform.position;
+                UIInventoryItem.Dragged.Rect.anchoredPosition += gamepadDragOffset;
+                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                pointerEventData.pointerDrag = UIInventoryItem.Dragged.gameObject;
+                OnPointerEnter(pointerEventData);
+            }
+        }
+
+        private void OnDeselect(BaseEventData eventData)
+        {
+            if (UIInventoryItem.Dragged)
+            {
+                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+                pointerEventData.pointerDrag = UIInventoryItem.Dragged.gameObject;
+                OnPointerExit(pointerEventData);
             }
         }
     }

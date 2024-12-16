@@ -2,17 +2,28 @@ using HHG.Common.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace HHG.InventorySystem.Runtime
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class UIInventoryItem : MonoBehaviour, IRefreshable<IInventoryItem>, IBeginDragHandler, IDragHandler, IEndDragHandler, ITooltip
+    public class UIInventoryItem : 
+        MonoBehaviour, 
+        IRefreshable<IInventoryItem>, 
+        ITooltip, 
+        IBeginDragHandler, 
+        IDragHandler, 
+        IEndDragHandler
     {
+        public static UIInventoryItem Dragged;
+
         public IInventoryItem Item => item;
         public string TooltipText => item?.TooltipText ?? string.Empty;
         public UIInventorySlot Slot => slot;
+        public RectTransform Rect => rect;
 
         [SerializeField] private bool disableDrag;
         [SerializeField, FormerlySerializedAs("ItemIcon")] private Image icon;
@@ -21,11 +32,13 @@ namespace HHG.InventorySystem.Runtime
         [SerializeField] private ActionEvent onBeginDrag = new ActionEvent();
         [SerializeField] private ActionEvent onEndDrag = new ActionEvent();
 
-        private IInventoryItem item;
-        private Canvas canvas;
-        private RectTransform rect;
-        private CanvasGroup canvasGroup;
+        private InputActionReference submitActionReference;
+        private InputActionReference cancelActionReference;
         private UIInventorySlot slot;
+        private RectTransform rect;
+        private Canvas canvas;
+        private CanvasGroup canvasGroup;
+        private IInventoryItem item;
 
         private void Awake()
         {
@@ -33,6 +46,14 @@ namespace HHG.InventorySystem.Runtime
             rect = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();
             slot = GetComponentInParent<UIInventorySlot>(true);
+
+            if (EventSystem.current && EventSystem.current.TryGetComponent(out InputSystemUIInputModule module))
+            {
+                submitActionReference = module.submit;
+                cancelActionReference = module.cancel;
+                submitActionReference.action.performed += OnSubmit;
+                cancelActionReference.action.performed += OnCancel;
+            }           
         }
 
         public virtual void Refresh(IInventoryItem inventoryItem)
@@ -60,10 +81,7 @@ namespace HHG.InventorySystem.Runtime
         {
             if (!disableDrag)
             {
-                transform.SetParent(rect.root);
-                transform.SetAsLastSibling();
-                canvasGroup.blocksRaycasts = false;
-                onBeginDrag?.Invoke(this);
+                HandleBeginDrag();
             }
         }
 
@@ -79,10 +97,7 @@ namespace HHG.InventorySystem.Runtime
         {
             if (!disableDrag)
             {
-                transform.SetParent(slot.transform);
-                canvasGroup.blocksRaycasts = true;
-                rect.anchoredPosition = Vector2.zero;
-                onEndDrag?.Invoke(this);
+                HandleEndDrag();   
             }
         }
 
@@ -94,6 +109,85 @@ namespace HHG.InventorySystem.Runtime
         public void DisableDrag()
         {
             disableDrag = true;
+        }
+
+        private void HandleDrop(UIInventorySlot slot)
+        {
+            PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+            pointerEventData.pointerDrag = Dragged.gameObject;
+            slot.OnDrop(pointerEventData);
+
+            Dragged = null;
+            HandleEndDrag();
+        }
+
+        private void HandleBeginDrag()
+        {
+            transform.SetParent(rect.root);
+            transform.SetAsLastSibling();
+            canvasGroup.blocksRaycasts = false;
+            onBeginDrag?.Invoke(this);
+        }
+
+        private void HandleEndDrag()
+        {
+            transform.SetParent(slot.transform);
+            canvasGroup.blocksRaycasts = true;
+            rect.anchoredPosition = Vector2.zero;
+            onEndDrag?.Invoke(this);
+        }
+
+        private void OnSubmit(InputAction.CallbackContext ctx)
+        {
+            if (slot.Selectable.gameObject != EventSystem.current.currentSelectedGameObject)
+            {
+                return;
+            }
+
+            if (!disableDrag)
+            {
+                if (Dragged == null)
+                {
+                    Dragged = this;
+                    HandleBeginDrag();
+
+                    EventSystem.current.SetSelectedGameObject(null);
+                    slot.Selectable.Select();
+                }
+                else
+                {
+                    Dragged.HandleDrop(slot);
+                }
+            }
+        }
+
+        private void OnCancel(InputAction.CallbackContext ctx)
+        {
+            if (slot.Selectable.gameObject != EventSystem.current.currentSelectedGameObject)
+            {
+                return;
+            }
+
+            if (!disableDrag)
+            {
+                if (Dragged)
+                {
+                    Dragged.HandleEndDrag();
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (submitActionReference)
+            {
+                submitActionReference.action.performed -= OnSubmit;
+            }
+
+            if (cancelActionReference)
+            {
+                cancelActionReference.action.performed -= OnCancel;
+            }
         }
     }
 }
