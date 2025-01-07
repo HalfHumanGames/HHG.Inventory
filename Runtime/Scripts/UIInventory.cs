@@ -185,18 +185,18 @@ namespace HHG.InventorySystem.Runtime
 
                 RectTransform rect = scroll.GetComponent<RectTransform>();
 
-                Scrollbar hbar = scroll.horizontalScrollbar;
-                Scrollbar vbar = scroll.verticalScrollbar;
+                Scrollbar hScrollbar = scroll.horizontalScrollbar;
+                Scrollbar vScrollbar = scroll.verticalScrollbar;
 
-                RectTransform hRect = hbar.GetComponent<RectTransform>();
-                RectTransform vRect = vbar.GetComponent<RectTransform>();
+                float hRectHeight = hScrollbar && hScrollbar.TryGetComponent(out RectTransform hRect) ? hRect.sizeDelta.y : 0f;
+                float vRectWidth = vScrollbar && vScrollbar.TryGetComponent(out RectTransform vRect) ? vRect.sizeDelta.x : 0f;
 
-                float addx = viewSize.y == gridSize.y ? 0f : vRect.sizeDelta.x;
-                float addy = viewSize.x == gridSize.x ? 0f : hRect.sizeDelta.y;
+                float addY = viewSize.x == gridSize.x ? 0f : hRectHeight;
+                float addX = viewSize.y == gridSize.y ? 0f : vRectWidth;
 
                 rect.sizeDelta = new Vector2(
-                    (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addx,
-                    (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing) + (slotPadding * 2) + addy
+                    (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addX,
+                    (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing) + (slotPadding * 2) + addY
                 );
             }
 
