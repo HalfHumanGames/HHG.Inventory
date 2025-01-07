@@ -15,10 +15,10 @@ namespace HHG.InventorySystem.Runtime
         [SerializeField] private Vector2Int gridSize;
         [SerializeField] private Vector2Int viewSize;
         [SerializeField] private Vector2Int slotSize;
-        [SerializeField] private int padding;
         [SerializeField] private float spacing;
-        [SerializeField] private int slotPadding;
-        [SerializeField] private float slotSpacing;
+        [SerializeField] private RectOffset padding = new RectOffset();
+        [SerializeField] private RectOffset slotPadding = new RectOffset();
+        [SerializeField] private Vector2 slotSpacing;
         [SerializeField] private UIInventorySlot slotPrefab;
         [SerializeField] private GridLayoutGroup slotContainer;
 
@@ -141,11 +141,11 @@ namespace HHG.InventorySystem.Runtime
             slotContainer.cellSize = slotSize;
             slotContainer.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             slotContainer.constraintCount = gridSize.x;
-            slotContainer.padding = new RectOffset(slotPadding, slotPadding, slotPadding, slotPadding);
-            slotContainer.spacing = new Vector2(slotSpacing, slotSpacing);
+            slotContainer.padding = slotPadding;
+            slotContainer.spacing = slotSpacing;
 
             VerticalLayoutGroup verticalLayoutGroup = GetComponent<VerticalLayoutGroup>();
-            verticalLayoutGroup.padding = new RectOffset(padding, padding, padding, padding);
+            verticalLayoutGroup.padding = padding;
             verticalLayoutGroup.spacing = spacing;
 
             Transform container = slotContainer.transform;
@@ -195,8 +195,8 @@ namespace HHG.InventorySystem.Runtime
                 float addX = viewSize.y == gridSize.y ? 0f : vRectWidth;
 
                 rect.sizeDelta = new Vector2(
-                    (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing) + (slotPadding * 2) + addX,
-                    (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing) + (slotPadding * 2) + addY
+                    (viewSize.x * slotSize.x) + ((viewSize.x - 1) * slotSpacing.x) + (slotPadding.left + slotPadding.right) + addX,
+                    (viewSize.y * slotSize.y) + ((viewSize.y - 1) * slotSpacing.y) + (slotPadding.top + slotPadding.bottom) + addY
                 );
             }
 
