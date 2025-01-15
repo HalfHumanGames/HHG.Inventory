@@ -31,16 +31,8 @@ namespace HHG.InventorySystem.Runtime
             selectable = GetComponent<Selectable>();
             eventTrigger = GetComponent<EventTrigger>();
             refreshables = GetComponentsInChildren<IRefreshable<IInventoryItem>>(true);
-
-            EventTrigger.Entry entry = new EventTrigger.Entry();
-            entry.eventID = EventTriggerType.Select;
-            entry.callback.AddListener(OnSelect);
-            eventTrigger.triggers.Add(entry);
-
-            EventTrigger.Entry entry2 = new EventTrigger.Entry();
-            entry2.eventID = EventTriggerType.Deselect;
-            entry2.callback.AddListener(OnDeselect);
-            eventTrigger.triggers.Add(entry2);
+            eventTrigger.AddTrigger(EventTriggerType.Select, OnSelect);
+            eventTrigger.AddTrigger(EventTriggerType.Deselect, OnDeselect);
         }
 
         public void Refresh(IInventoryItem inventoryItem)
