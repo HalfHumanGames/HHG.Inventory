@@ -104,7 +104,7 @@ namespace HHG.InventorySystem.Runtime
 
                     if (tooltip && !string.IsNullOrEmpty(tooltipText))
                     {
-                        tooltip.Show(tooltipText, from.transform.position);
+                        tooltip.Show(tooltipText, to.transform.position);
                     }
 
                     handlers[i].HandleDragEnter(from, to);
