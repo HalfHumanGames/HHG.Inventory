@@ -2,6 +2,8 @@ namespace HHG.InventorySystem.Runtime
 {
     public interface IInventoryDropHandler
     {
+        public string CanDropTooltipText => string.Empty;
+        public string CannotDropTooltipText => string.Empty;
         bool IsValidDropTarget(UIInventorySlot from, UIInventorySlot to) => true;
         bool CanDrop(UIInventorySlot from, UIInventorySlot to) => true;
         void HandleDrop(UIInventorySlot from, UIInventorySlot to);

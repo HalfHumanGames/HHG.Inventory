@@ -19,11 +19,11 @@ namespace HHG.InventorySystem.Runtime
         [SerializeField] private StartAction startAction;
         [SerializeField] private InventoryAsset _inventory;
 
+        private UITooltip tooltip;
         private Lazy<UIInventory> _uiInventory = new Lazy<UIInventory>();
         private UIInventory uiInventory => _uiInventory.FromComponent(this);
         private IInventory inventory;
         private List<IInventoryDropHandler> handlers = new List<IInventoryDropHandler>() { new InventoryDropHandler() };
-        private Dictionary<IInventoryDropHandler, Texture2D[]> cursors = new Dictionary<IInventoryDropHandler, Texture2D[]>();
 
         private enum StartAction
         {
@@ -39,6 +39,8 @@ namespace HHG.InventorySystem.Runtime
 
         private void Start()
         {
+            Locator.TryGet(out tooltip);
+
             uiInventory.Refresh(inventory);
 
             switch (startAction)
@@ -71,20 +73,6 @@ namespace HHG.InventorySystem.Runtime
             handlers.Remove(h => h.GetType() == typeof(T));
         }
 
-        public void SetHandlerCursor<T>(Texture2D cursor, Texture2D cursor2 = null) where T : IInventoryDropHandler
-        {
-            T handler = handlers.OfType<T>().FirstOrDefault();
-            cursors[handler] = cursor2 == null ?
-                new Texture2D[] { cursor, cursor } : 
-                new Texture2D[] { cursor, cursor2 };
-        }
-
-        public void UnsetHandlerCursor<T>() where T : IInventoryDropHandler
-        {
-            T handler = handlers.OfType<T>().FirstOrDefault();
-            cursors.Remove(handler);
-        }
-
         public void HandleDrop(UIInventorySlot from, UIInventorySlot to)
         {
             for (int i = handlers.Count - 1; i >= 0; i--)
@@ -99,7 +87,10 @@ namespace HHG.InventorySystem.Runtime
                 }
             }
 
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            if (tooltip)
+            {
+                tooltip.Hide();
+            }
         }
 
 
@@ -109,11 +100,13 @@ namespace HHG.InventorySystem.Runtime
             {
                 if (handlers[i].IsValidDropTarget(from, to))
                 {
-                    if (cursors.TryGetValue(handlers[i], out Texture2D[] current))
+                    string tooltipText = handlers[i].CanDrop(from, to) ? handlers[i].CanDropTooltipText : handlers[i].CannotDropTooltipText;
+
+                    if (tooltip && !string.IsNullOrEmpty(tooltipText))
                     {
-                        Texture2D cursor = handlers[i].CanDrop(from, to) ? current[0] : current[1];
-                        Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
+                        tooltip.Show(tooltipText, from.transform.position);
                     }
+
                     handlers[i].HandleDragEnter(from, to);
                     break;
                 }
@@ -126,8 +119,13 @@ namespace HHG.InventorySystem.Runtime
             {
                 if (handlers[i].IsValidDropTarget(from, to))
                 {
-                    Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
                     handlers[i].HandleDragExit(from, to);
+
+                    if (tooltip)
+                    {
+                        tooltip.Hide();
+                    }
+
                     break;
                 }
             }
