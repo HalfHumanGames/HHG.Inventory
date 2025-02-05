@@ -96,8 +96,8 @@ namespace HHG.InventorySystem.Runtime
                     tooltipTrigger.HideTooltip();
                 }
 
-                UIInventoryItem.Dragged.Rect.position = transform.position;
-                UIInventoryItem.Dragged.Rect.anchoredPosition += gamepadDragOffset;
+                UIInventoryItem.Dragged.RectTransform.position = transform.position;
+                UIInventoryItem.Dragged.RectTransform.anchoredPosition += gamepadDragOffset;
                 PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
                 pointerEventData.pointerDrag = UIInventoryItem.Dragged.gameObject;
                 OnPointerEnter(pointerEventData);

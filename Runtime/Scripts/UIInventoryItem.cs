@@ -23,7 +23,7 @@ namespace HHG.InventorySystem.Runtime
         public IInventoryItem Item => item;
         public string TooltipText => item?.TooltipText ?? string.Empty;
         public UIInventorySlot Slot => slot;
-        public RectTransform Rect => rect;
+        public RectTransform RectTransform => rect;
 
         [SerializeField] private bool disableDrag;
         [SerializeField, FormerlySerializedAs("ItemIcon")] private Image icon;
