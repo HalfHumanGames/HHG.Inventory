@@ -2,7 +2,7 @@ using HHG.Common.Runtime;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     public class UIInventorySlotContainer : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {

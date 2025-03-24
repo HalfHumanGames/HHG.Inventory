@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     [RequireComponent(typeof(Selectable), typeof(EventTrigger))]
     public class UIInventorySlot : MonoBehaviour, IRefreshable<IInventoryItem>, IDropHandler, IPointerEnterHandler, IPointerExitHandler

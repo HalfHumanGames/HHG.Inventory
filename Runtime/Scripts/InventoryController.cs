@@ -1,10 +1,9 @@
 using HHG.Common.Runtime;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     [RequireComponent(typeof(UIInventory))]
     public class InventoryController : MonoBehaviour

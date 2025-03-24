@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class UIInventoryItem : 

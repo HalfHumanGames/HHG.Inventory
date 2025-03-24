@@ -1,7 +1,7 @@
 using HHG.Common.Runtime;
 using UnityEngine;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     public interface IInventoryItem : ITooltip
     {

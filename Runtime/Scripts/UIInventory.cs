@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     [ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(CanvasGroup)), SelectionBase]
     public class UIInventory : MonoBehaviour, IRefreshable<IInventory>

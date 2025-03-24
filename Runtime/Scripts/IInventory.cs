@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     public interface IInventory : IList<IInventoryItem>
     {

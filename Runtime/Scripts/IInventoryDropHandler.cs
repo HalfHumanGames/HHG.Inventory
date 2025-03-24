@@ -1,4 +1,4 @@
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     public interface IInventoryDropHandler
     {

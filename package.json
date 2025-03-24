@@ -1,13 +1,13 @@
 {
-  "name": "com.halfhumangames.inventorysystem",
+  "name": "com.halfhumangames.inventory",
   "version": "1.0.0",
-  "displayName": "HHG - Inventory System",
+  "displayName": "HHG - Inventory",
   "description": "Inventory system for Unity",
   "unity": "2020.3",
   "unityRelease": "6f1",
-  "documentationUrl": "https://github.com/HalfHumanGames/HHG.InventorySystem/blob/main/README.md",
-  "changelogUrl": "https://github.com/HalfHumanGames/HHG.InventorySystem/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/HalfHumanGames/HHG.InventorySystem/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/HalfHumanGames/HHG.Inventory/blob/main/README.md",
+  "changelogUrl": "https://github.com/HalfHumanGames/HHG.Inventory/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/HalfHumanGames/HHG.Inventory/blob/main/LICENSE",
   "keywords": [
     "Inventory",
     "Element"

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace HHG.InventorySystem.Runtime
+namespace HHG.Inventory.Runtime
 {
     [CreateAssetMenu(fileName = "Inventory", menuName = "HHG/Inventory System/Inventory Asset")]
     public class InventoryAsset : ScriptableObject
